@@ -9,6 +9,17 @@ import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import CompareModal from './components/CompareModal';
 import RentalModal from './components/RentalModal';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Leaflet uchun marker ikonini to'g'rilash
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const locales = {
   uz: {
@@ -91,6 +102,7 @@ const locales = {
     workingHours: "Dushanba-Juma: 9:00-18:00 Shanba: 10:00-15:00",
     newsTitle: "Oxirgi Yangiliklar",
     newsPlaceholder: "Hozircha yangiliklar mavjud emas.",
+    sendMessageHeading: "Xabar yuborish",
     footerTitle: "LeaseON",
     footerLinksTitle: "Havolalar",
     footerContactTitle: "Bog'lanish",
@@ -135,7 +147,7 @@ const locales = {
     feature2Title: "Удобные фильтры поиска",
     feature2Text: "Настройте поиск по местоположению, цене, количеству комнат и многим другим параметрам. Экономьте время и просматривайте только те варианты, которые вам подходят.",
     feature3Title: "Быстрое и простое размещение объявлений",
-    feature3Text: "Хотите сдать свою недвижимость? Разместите объявление на LeaseON всего за несколько шагов. Мы поможем вам найти потенциальных арендаторов.",
+    feature3Text: "Хотите сдать свою недвижимость? Разместите объявление на LeaseON в just a few steps. Мы поможем вам найти потенциальных арендаторов.",
     aboutCard1Title: "Наша Цель",
     aboutCard1Text: "Наша цель - создать базу данных объявлений о сдаче недвижимости и предоставить нашим пользователям максимальное количество информации для принятия правильного решения.",
     aboutCard2Title: "Наши Достижения",
@@ -183,6 +195,7 @@ const locales = {
     workingHours: "Понедельник-Пятница: 9:00-18:00 Суббота: 10:00-15:00",
     newsTitle: "Последние Новости",
     newsPlaceholder: "Новостей пока нет.",
+    sendMessageHeading: "Отправить сообщение",
     footerTitle: "LeaseON",
     footerLinksTitle: "Ссылки",
     footerContactTitle: "Контакты",
@@ -275,6 +288,7 @@ const locales = {
     workingHours: "Monday-Friday: 9:00-18:00 Saturday: 10:00-15:00",
     newsTitle: "Latest News",
     newsPlaceholder: "No news available yet.",
+    sendMessageHeading: "Send Message",
     footerTitle: "LeaseON",
     footerLinksTitle: "Links",
     footerContactTitle: "Contact",
@@ -401,6 +415,12 @@ function App() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [savedRentals, setSavedRentals] = useState([]);
   const [searchResults, setSearchResults] = useState(rentalsData[currentLanguage]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [sharingRentalId, setSharingRentalId] = useState(null);
+  const [mapCenter, setMapCenter] = useState([41.3115, 69.2429]); // Toshkent koordinatalari
+  const [markerPosition, setMarkerPosition] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [nearbyRentals, setNearbyRentals] = useState([]);
 
   const t = locales[currentLanguage];
 
@@ -497,9 +517,6 @@ function App() {
     );
   };
 
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [sharingRentalId, setSharingRentalId] = useState(null);
-
   const openShareModal = (rentalId) => {
     setSharingRentalId(rentalId);
     setShowShareModal(true);
@@ -533,6 +550,23 @@ function App() {
     handleSearch();
   }, [searchTermCity, searchTermBeds, selectedPrice, rentals]);
 
+  // Yaqin atrofdagi kvartiralarni topish funksiyasi
+  const findNearbyRentals = (lat, lng) => {
+    // Bu yerda real loyihada API orqali ma'lumotlarni olish kerak
+    // Hozircha test ma'lumotlar bilan ishlaymiz
+    const mockRentals = rentals.filter(rental => {
+      // Bu yerda real loyihada koordinatalar bo'yicha masofani hisoblash kerak
+      return Math.random() > 0.5; // Test uchun tasodifiy kvartiralarni qaytaramiz
+    });
+    setNearbyRentals(mockRentals);
+  };
+
+  // Xaritada joy tanlanganda
+  const handleLocationSelect = (latlng) => {
+    setMarkerPosition(latlng);
+    setSelectedLocation(latlng);
+    findNearbyRentals(latlng.lat, latlng.lng);
+  };
 
   return (
     <div className={`app ${isDarkMode ? 'dark' : ''}`}>
@@ -585,12 +619,14 @@ function App() {
         <section id="rentals-section" className="rentals-section">
           <h2>{t.rentals}</h2>
           <div className="search-bar">
+            {/* Location search dropdown */}
             <select value={searchTermCity} onChange={(e) => setSearchTermCity(e.target.value)}>
               <option value="">{t.selectLocation}</option>
               {locales[currentLanguage].locations.map(location => (
                 <option key={location} value={location}>{location}</option>
               ))}
             </select>
+            {/* Price and Bedroom filters */}
             <select value={searchTermBeds} onChange={(e) => setSearchTermBeds(e.target.value)}>
               <option value="">{t.selectBedroom}</option>
               {locales[currentLanguage].bedroomOptions.map(beds => (
@@ -615,7 +651,7 @@ function App() {
                 <div className="rental-info">
                   <h3>{rental.title}</h3>
                   <p className="rental-city">{rental.city}</p>
-                  <p className="rental-beds">{rental.beds} beds</p>
+                  <p className="rental-beds">{rental.beds}</p>
                   <p className="rental-price">{rental.price}{rental.currency}</p>
                   <div className="rental-actions" onClick={(e) => e.stopPropagation()}>
                   <button
@@ -629,6 +665,43 @@ function App() {
 
               </div>
             ))}
+          </div>
+        </section>
+
+        <section id="map-section" className="map-section">
+          <h2>{t.locationLabel}</h2>
+          <div className="map-container">
+            <MapContainer 
+              center={mapCenter} 
+              zoom={13} 
+              style={{ height: "400px", width: "100%" }}
+              attributionControl={false}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                /* attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' */
+              />
+              <LocationMarker onLocationSelect={handleLocationSelect} />
+              {markerPosition && (
+                <Marker position={markerPosition} />
+              )}
+            </MapContainer>
+            {selectedLocation && nearbyRentals.length > 0 && (
+              <div className="nearby-rentals">
+                <h3>{t.nearbyRentals || "Yaqin atrofdagi kvartiralar"}</h3>
+                {nearbyRentals.map(rental => (
+                  <div 
+                    key={rental.id} 
+                    className="nearby-rental-item"
+                    onClick={() => openRentalModal(rental)}
+                  >
+                    <h4>{rental.title}</h4>
+                    <p>{rental.price}</p>
+                    <p>{rental.beds}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -677,28 +750,24 @@ function App() {
         <h2>{t.contactFormTitle}</h2>
         <div className="contact-container">
           <div className="contact-form">
+            <h2>{t.sendMessageHeading}</h2>
             <div className="form-group">
-              <label htmlFor="contact-name">{t.contactFormNamePlaceholder}</label>
               <input type="text" id="contact-name" placeholder={t.contactFormNamePlaceholder} />
             </div>
             <div className="form-group">
-              <label htmlFor="contact-email">{t.contactFormEmailPlaceholder}</label>
               <input type="email" id="contact-email" placeholder={t.contactFormEmailPlaceholder} />
             </div>
             <div className="form-group">
-              <label htmlFor="contact-message">{t.contactFormMessagePlaceholder}</label>
               <textarea id="contact-message" placeholder={t.contactFormMessagePlaceholder} className="contact-textarea"></textarea>
             </div>
             <button type="submit">{t.contactFormButton}</button>
           </div>
           <div className="contact-info">
             <h3>{t.contactInfoTitle}</h3>
-            <p><FaMapMarkerAlt /> <b>{t.addressLabel}:</b> {t.contactAddress}</p>
-            <p><FaPhone /> <b>{t.phoneLabel}:</b> {t.contactPhone1}</p>
-            <p style={{ marginLeft: '28px' }}>{t.contactPhone2}</p>
-            <p><FaEnvelope /> <b>{t.emailLabel}:</b> {t.contactEmail1}</p>
-            <p style={{ marginLeft: '28px' }}>{t.contactEmail2}</p>
-            <p><FaClock /> <b>{t.workingHoursLabel}:</b> {t.workingHours}</p>
+            <p><FaMapMarkerAlt /> <b>{t.addressLabel}:</b> <span>{t.contactAddress}</span></p>
+            <p><FaPhone /> <b>{t.phoneLabel}:</b> <span>{t.contactPhone1}<br/>{t.contactPhone2}</span></p>
+            <p><FaEnvelope /> <b>{t.emailLabel}:</b> <span>{t.contactEmail1}<br/>{t.contactEmail2}</span></p>
+            <p><FaClock /> <b>{t.workingHoursLabel}:</b> <span>{t.workingHours}</span></p>
           </div>
         </div>
 
@@ -760,6 +829,17 @@ function App() {
       </footer>
     </div>
   );
+}
+
+// Xarita uchun yordamchi komponent
+function LocationMarker({ onLocationSelect }) {
+  const map = useMapEvents({
+    click(e) {
+      onLocationSelect(e.latlng);
+    },
+  });
+
+  return null;
 }
 
 export default App;
