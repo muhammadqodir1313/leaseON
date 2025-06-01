@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/rendora/static/css/main.6b703a5f.css",
-    "main.js": "/rendora/static/js/main.8dc2cccf.js",
-    "static/js/453.bd01f6ef.chunk.js": "/rendora/static/js/453.bd01f6ef.chunk.js",
-    "static/media/loft.png": "/rendora/static/media/loft.435ec65021140b40f302.png",
-    "static/media/apartment.png": "/rendora/static/media/apartment.1a148660c353df23021b.png",
-    "static/media/studio.png": "/rendora/static/media/studio.a14f18beaa8b11b7b7e7.png",
-    "index.html": "/rendora/index.html",
-    "main.6b703a5f.css.map": "/rendora/static/css/main.6b703a5f.css.map",
-    "main.8dc2cccf.js.map": "/rendora/static/js/main.8dc2cccf.js.map",
-    "453.bd01f6ef.chunk.js.map": "/rendora/static/js/453.bd01f6ef.chunk.js.map"
+    "main.css": "/leaseON/static/css/main.6b703a5f.css",
+    "main.js": "/leaseON/static/js/main.5c76d17b.js",
+    "static/js/453.bd01f6ef.chunk.js": "/leaseON/static/js/453.bd01f6ef.chunk.js",
+    "static/media/loft.png": "/leaseON/static/media/loft.435ec65021140b40f302.png",
+    "static/media/apartment.png": "/leaseON/static/media/apartment.1a148660c353df23021b.png",
+    "static/media/studio.png": "/leaseON/static/media/studio.a14f18beaa8b11b7b7e7.png",
+    "index.html": "/leaseON/index.html",
+    "main.6b703a5f.css.map": "/leaseON/static/css/main.6b703a5f.css.map",
+    "main.5c76d17b.js.map": "/leaseON/static/js/main.5c76d17b.js.map",
+    "453.bd01f6ef.chunk.js.map": "/leaseON/static/js/453.bd01f6ef.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.6b703a5f.css",
-    "static/js/main.8dc2cccf.js"
+    "static/js/main.5c76d17b.js"
   ]
 }
