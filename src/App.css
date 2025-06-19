@@ -991,7 +991,7 @@ h1, h2 {
   margin: 20px auto;
 }
 
-.contact-form {
+.contact-form, .contact-info {
   flex: 1;
   min-width: 300px;
   padding: 20px;
@@ -1128,8 +1128,8 @@ h1, h2 {
     gap: 20px;
   }
   .contact-form, .contact-info {
-    width: 95%;
-    max-width: none;
+    width: 100%;
+    max-width: 400px;
   }
 }
 
@@ -1365,7 +1365,7 @@ footer {
     gap: 20px;
   }
   .contact-form, .contact-info {
-    width: 95%;
-    max-width: none;
+    width: 100%;
+    max-width: 400px;
   }
 }
