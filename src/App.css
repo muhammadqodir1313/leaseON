@@ -1347,3 +1347,25 @@ footer {
 .app.dark .footer-logo p {
   color: #4b5563; /* Dark modeda mualliflik xuquqi rangi */
 }
+
+@media (max-width: 768px) {
+  .about-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .about-card {
+    width: 95%;
+    min-width: unset;
+    max-width: 400px;
+  }
+  .contact-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .contact-form, .contact-info {
+    width: 95%;
+    max-width: none;
+  }
+}
