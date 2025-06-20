@@ -3,7 +3,6 @@ import "./App.css";
 import studioImg from './assets/studio.png';
 import apartmentImg from './assets/apartment.png';
 import loftImg from './assets/loft.png';
-import logoImg from './assets/logo.png';
 import { FaSun, FaMoon, FaEnvelope, FaMapMarkerAlt, FaPhone, FaClock } from 'react-icons/fa';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
@@ -403,443 +402,508 @@ const rentalsData = {
 };
 
 function App() {
-  const [currentLanguage, setCurrentLanguage] = useState('uz');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [language, setLanguage] = useState("uz");
+  const [rentals, setRentals] = useState(rentalsData[language]);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [rentals, setRentals] = useState(rentalsData[currentLanguage]);
   const [showCompareModal, setShowCompareModal] = useState(false);
-  const [rentalsToCompare, setRentalsToCompare] = useState([]);
+  const [compareList, setCompareList] = useState([]);
   const [showRentalModal, setShowRentalModal] = useState(false);
   const [selectedRental, setSelectedRental] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [savedRentals, setSavedRentals] = useState([]);
-  const [searchResults, setSearchResults] = useState(rentalsData[currentLanguage]);
+  const [ratings, setRatings] = useState({});
   const [showShareModal, setShowShareModal] = useState(false);
-  const [sharingRentalId, setSharingRentalId] = useState(null);
-  const [mapCenter, setMapCenter] = useState([41.3115, 69.2429]); // Toshkent koordinatalari
-  const [markerPosition, setMarkerPosition] = useState(null);
+  const [shareRentalId, setShareRentalId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [priceFilter, setPriceFilter] = useState('');
+  const [bedroomsFilter, setBedroomsFilter] = useState('');
+  const [mapCenter, setMapCenter] = useState([40.7128, -74.0060]); 
+  const [searchResults, setSearchResults] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [nearbyRentals, setNearbyRentals] = useState([]);
 
-  const t = locales[currentLanguage];
+  const t = locales[language];
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      setIsDarkMode(true);
-    } else {
-      setIsDarkMode(false);
-    }
-  }, []);
+    setRentals(rentalsData[language]);
+  }, [language]);
 
-   useEffect(() => {
-    setRentals(rentalsData[currentLanguage].map(rental => ({ ...rental, isSaved: rental.isSaved || false, rating: rental.rating || 0 })));
-    setSearchResults(rentalsData[currentLanguage].map(rental => ({ ...rental, isSaved: rental.isSaved || false, rating: rental.rating || 0 })));
-  }, [currentLanguage]);
-
+  useEffect(() => {
+    document.body.className = darkMode ? 'dark-mode' : 'light-mode';
+  }, [darkMode]);
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    if (isDarkMode) {
-      localStorage.setItem('theme', 'light');
-    } else {
-      localStorage.setItem('theme', 'dark');
-    }
+    setDarkMode(!darkMode);
   };
 
   const handleLanguageChange = (event) => {
-    setCurrentLanguage(event.target.value);
+    setLanguage(event.target.value);
   };
 
   const openLoginModal = () => setShowLoginModal(true);
   const openRegisterModal = () => setShowRegisterModal(true);
 
   const toggleCompare = (rental) => {
-    setRentalsToCompare(prev =>
-      prev.find(item => item.id === rental.id)
-        ? prev.filter(item => item.id !== rental.id)
+    setCompareList((prev) =>
+      prev.find((r) => r.id === rental.id)
+        ? prev.filter((r) => r.id !== rental.id)
         : [...prev, rental]
     );
   };
 
   const openCompareModal = () => {
-    if (rentalsToCompare.length > 0) {
+    if (compareList.length > 0) {
       setShowCompareModal(true);
     }
   };
 
   const clearComparison = () => {
-    setRentalsToCompare([]);
+    setCompareList([]);
+    setShowCompareModal(false);
   };
 
   const openRentalModal = (rental) => {
     setSelectedRental(rental);
+    setCurrentImageIndex(0); 
     setShowRentalModal(true);
-    setCurrentImageIndex(0);
   };
 
   const closeRentalModal = () => {
-    setSelectedRental(null);
     setShowRentalModal(false);
-    setCurrentImageIndex(0);
+    setSelectedRental(null);
   };
 
   const nextImage = () => {
-    if (selectedRental && selectedRental.images) {
+    if (selectedRental) {
       setCurrentImageIndex((prevIndex) =>
-        (prevIndex + 1) % selectedRental.images.length
+        prevIndex === selectedRental.images.length - 1 ? 0 : prevIndex + 1
       );
     }
   };
 
   const prevImage = () => {
-    if (selectedRental && selectedRental.images) {
+    if (selectedRental) {
       setCurrentImageIndex((prevIndex) =>
-        (prevIndex - 1 + selectedRental.images.length) % selectedRental.images.length
+        prevIndex === 0 ? selectedRental.images.length - 1 : prevIndex - 1
       );
     }
   };
 
   const toggleSave = (rentalId) => {
-    setRentals(prevRentals =>
-      prevRentals.map(rental =>
-        rental.id === rentalId ? { ...rental, isSaved: !rental.isSaved } : rental
-      )
+    setSavedRentals((prev) =>
+      prev.includes(rentalId)
+        ? prev.filter((id) => id !== rentalId)
+        : [...prev, rentalId]
     );
   };
 
   const handleRating = (rentalId, rating) => {
-    setRentals(prevRentals =>
-      prevRentals.map(rental =>
-        rental.id === rentalId ? { ...rental, rating: rating } : rental
-      )
-    );
+    setRatings((prev) => ({ ...prev, [rentalId]: rating }));
   };
 
   const openShareModal = (rentalId) => {
-    setSharingRentalId(rentalId);
+    setShareRentalId(rentalId);
     setShowShareModal(true);
   };
 
   const closeShareModal = () => {
-    setSharingRentalId(null);
     setShowShareModal(false);
   };
 
   const shareOnSocialMedia = (platform) => {
-    console.log(`Sharing rental ${sharingRentalId} on ${platform}`);
+    const rentalUrl = `${window.location.origin}/rental/${shareRentalId}`;
+    let shareUrl = '';
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(rentalUrl)}`;
+        break;
+      case 'telegram':
+        shareUrl = `https://t.me/share/url?url=${encodeURIComponent(rentalUrl)}&text=Check out this rental!`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(rentalUrl)}&text=Check out this rental!`;
+        break;
+      default:
+        break;
+    }
+    if (shareUrl) {
+      window.open(shareUrl, '_blank');
+    }
     closeShareModal();
   };
 
-  const [searchTermCity, setSearchTermCity] = useState('');
-  const [searchTermBeds, setSearchTermBeds] = useState('');
-  const [selectedPrice, setSelectedPrice] = useState('');
-
   const handleSearch = () => {
-    const filteredRentals = rentals.filter(rental => {
-      const cityMatch = searchTermCity === '' || rental.city.toLowerCase().includes(searchTermCity.toLowerCase());
-      const bedsMatch = searchTermBeds === '' || (rental.beds && rental.beds.toString() === searchTermBeds);
-      const priceMatch = selectedPrice === '' || rental.price === selectedPrice;
-      return cityMatch && bedsMatch && priceMatch;
-    });
-    setSearchResults(filteredRentals);
+    let filtered = rentals;
+
+    if (searchTerm) {
+      filtered = filtered.filter(rental =>
+        rental.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    if (locationFilter) {
+      filtered = filtered.filter(rental => rental.location === locationFilter);
+    }
+    if (priceFilter) {
+      const [min, max] = priceFilter.replace(/[^0-9-]/g, '').split('-');
+      filtered = filtered.filter(rental => {
+        const price = parseInt(rental.price.replace(/[^0-9]/g, ''));
+        if (max) {
+          return price >= parseInt(min) && price <= parseInt(max);
+        }
+        return price >= parseInt(min);
+      });
+    }
+    if (bedroomsFilter) {
+      if (bedroomsFilter.includes('+')) {
+        const minBeds = parseInt(bedroomsFilter.replace('+', ''));
+        filtered = filtered.filter(rental => rental.bedrooms >= minBeds);
+      } else {
+        filtered = filtered.filter(
+          (rental) => rental.bedrooms === parseInt(bedroomsFilter)
+        );
+      }
+    }
+    setSearchResults(filtered);
   };
 
-  useEffect(() => {
-    handleSearch();
-  }, [searchTermCity, searchTermBeds, selectedPrice, rentals]);
-
-  // Yaqin atrofdagi kvartiralarni topish funksiyasi
   const findNearbyRentals = (lat, lng) => {
-    // Bu yerda real loyihada API orqali ma'lumotlarni olish kerak
-    // Hozircha test ma'lumotlar bilan ishlaymiz
-    const mockRentals = rentals.filter(rental => {
-      // Bu yerda real loyihada koordinatalar bo'yicha masofani hisoblash kerak
-      return Math.random() > 0.5; // Test uchun tasodifiy kvartiralarni qaytaramiz
+    const nearby = rentals.filter(rental => {
+      const distance = L.latLng(lat, lng).distanceTo(L.latLng(rental.lat, rental.lng));
+      return distance < 5000; // 5 km radius
     });
-    setNearbyRentals(mockRentals);
+    setSearchResults(nearby);
   };
 
-  // Xaritada joy tanlanganda
+
   const handleLocationSelect = (latlng) => {
-    setMarkerPosition(latlng);
-    setSelectedLocation(latlng);
+    setMapCenter([latlng.lat, latlng.lng]);
     findNearbyRentals(latlng.lat, latlng.lng);
+    setSelectedLocation(latlng);
   };
+
 
   return (
-    <div className={`app ${isDarkMode ? 'dark' : ''}`}>
-      <header>
-        <a href="#" className="logo">
-          <img src={logoImg} alt="LeaseON Logo" />
-          LeaseON
-        </a>
-        <nav className="main-nav">
-          <a href="#home-section">{t.home}</a>
-          <a href="#rentals-section">{t.rentals}</a>
-          <a href="#about-section">{t.about}</a>
-          <a href="#about-section">{t.contact}</a>
+    <div className={`App ${darkMode ? "dark-mode" : "light-mode"}`}>
+      <header className="header">
+        <nav className="navbar">
+          <div className="navbar-left">
+          <a href="#home" className="brand">leaseON</a>
+          </div>
+          <div className="navbar-center">
+            <a href="#home" className="nav-link">
+              {t.home}
+            </a>
+            <a href="#rentals" className="nav-link">
+              {t.rentals}
+            </a>
+            <a href="#about" className="nav-link">
+              {t.about}
+            </a>
+            <a href="#contact" className="nav-link">
+              {t.contact}
+            </a>
+          </div>
+          <div className="navbar-right">
+            <button onClick={openLoginModal} className="btn-login">
+              {t.loginButton}
+            </button>
+            <button onClick={openRegisterModal} className="btn-signup">
+              {t.signupButton}
+            </button>
+            <button onClick={toggleDarkMode} className="dark-mode-toggle">
+              {darkMode ? <FaSun /> : <FaMoon />}
+            </button>
+            <select onChange={handleLanguageChange} value={language}>
+              <option value="uz">UZ</option>
+              <option value="ru">RU</option>
+              <option value="en">EN</option>
+            </select>
+          </div>
         </nav>
-        <div className="header-actions">
-          <button onClick={openLoginModal}>{t.loginButton}</button>
-          <button onClick={openRegisterModal}>{t.signupButton}</button>
-          <button onClick={toggleDarkMode} className="dark-mode-toggle">
-            {isDarkMode ? <FaSun /> : <FaMoon />}
-          </button>
-          <select value={currentLanguage} onChange={handleLanguageChange} className="lang-select">
-            <option value="uz">UZ</option>
-            <option value="ru">RU</option>
-            <option value="en">EN</option>
-          </select>
-        </div>
       </header>
       <main>
-
-        <section id="home-section" className="home-section">
+        {/* Hero Section */}
+        <section id="home" className="hero-section">
           <div className="hero-content">
-            <h1>{t.homeIntro}</h1>
-            <div className="home-features">
-              <div className="feature-item">
-                <h3>{t.feature1Title}</h3>
-                <p>{t.feature1Text}</p>
-              </div>
-              <div className="feature-item">
-                <h3>{t.feature2Title}</h3>
-                <p>{t.feature2Text}</p>
-              </div>
-              <div className="feature-item">
-                <h3>{t.feature3Title}</h3>
-                <p>{t.feature3Text}</p>
-              </div>
+            <h1>{t.find}</h1>
+            <p>{t.homeIntro}</p>
+            <div className="search-bar-container">
+              <input
+                type="text"
+                placeholder={t.search}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <select value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)}>
+                <option value="">{t.selectLocation}</option>
+                {t.locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+              </select>
+              <select value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)}>
+                <option value="">{t.selectPrice}</option>
+                {t.prices.map(price => <option key={price} value={price}>{price}</option>)}
+              </select>
+              <select value={bedroomsFilter} onChange={(e) => setBedroomsFilter(e.target.value)}>
+                <option value="">{t.selectBedroom}</option>
+                {t.bedroomOptions.map(bed => <option key={bed} value={bed}>{bed}</option>)}
+              </select>
+              <button onClick={handleSearch}>{t.search}</button>
             </div>
           </div>
         </section>
 
-        <section id="rentals-section" className="rentals-section">
-          <h2>{t.rentals}</h2>
-          <div className="search-bar">
-            {/* Location search dropdown */}
-            <select value={searchTermCity} onChange={(e) => setSearchTermCity(e.target.value)}>
-              <option value="">{t.selectLocation}</option>
-              {locales[currentLanguage].locations.map(location => (
-                <option key={location} value={location}>{location}</option>
-              ))}
-            </select>
-            {/* Price and Bedroom filters */}
-            <select value={searchTermBeds} onChange={(e) => setSearchTermBeds(e.target.value)}>
-              <option value="">{t.selectBedroom}</option>
-              {locales[currentLanguage].bedroomOptions.map(beds => (
-                <option key={beds} value={beds}>{beds}</option>
-              ))}
-            </select>
-            <select value={selectedPrice} onChange={(e) => setSelectedPrice(e.target.value)}>
-              <option value="">{t.selectPrice}</option>
-              {locales[currentLanguage].prices.map(price => (
-                <option key={price} value={price}>{price}</option>
-              ))}
-            </select>
-            <button onClick={openCompareModal} disabled={rentalsToCompare.length < 2}>
-              {t.compare} ({rentalsToCompare.length})
-            </button>
-          </div>
 
-          <div className="rentals">
-            {searchResults.map(rental => (
-              <div key={rental.id} className="rental-card" onClick={() => openRentalModal(rental)}>
-                <img src={rental.images[0]} alt={rental.title} />
+        {/* Features Section */}
+        <section className="features-section">
+          <div className="feature">
+            <h3>{t.feature1Title}</h3>
+            <p>{t.feature1Text}</p>
+          </div>
+          <div className="feature">
+            <h3>{t.feature2Title}</h3>
+            <p>{t.feature2Text}</p>
+          </div>
+          <div className="feature">
+            <h3>{t.feature3Title}</h3>
+            <p>{t.feature3Text}</p>
+          </div>
+        </section>
+
+        {/* Rentals Section */}
+        <section id="rentals" className="rentals-section">
+          <h2>{t.rentals}</h2>
+          <div className="rental-list">
+            {(searchResults.length > 0 ? searchResults : rentals).map((rental) => (
+              <div key={rental.id} className="rental-card">
+                <img
+                  src={rental.img}
+                  alt={rental.title}
+                  onClick={() => openRentalModal(rental)}
+                />
                 <div className="rental-info">
                   <h3>{rental.title}</h3>
-                  <p className="rental-city">{rental.city}</p>
-                  <p className="rental-beds">{rental.beds}</p>
-                  <p className="rental-price">{rental.price}{rental.currency}</p>
-                  <div className="rental-actions" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    className={`action-btn ${rentalsToCompare.find(item => item.id === rental.id) ? 'active' : ''}`}
-                    onClick={() => toggleCompare(rental)}
-                  >
-                    {t.compare}
-                  </button>
+                  <p>
+                    {rental.city} | {rental.beds}
+                  </p>
+                  <p>{rental.price}</p>
+                  <div className="rental-actions">
+                    <button
+                      onClick={() => toggleCompare(rental)}
+                      className={compareList.find((r) => r.id === rental.id) ? 'active' : ''}
+                    >
+                      {t.compare}
+                    </button>
+                  </div>
                 </div>
-                </div>
-
               </div>
             ))}
           </div>
+          {compareList.length > 0 && (
+            <button onClick={openCompareModal} className="compare-btn">
+              {t.compare} ({compareList.length})
+            </button>
+          )}
         </section>
 
-        <section id="map-section" className="map-section">
-          <h2>{t.locationLabel}</h2>
-          <div className="map-container">
-            <MapContainer 
-              center={mapCenter} 
-              zoom={13} 
-              style={{ height: "400px", width: "100%" }}
-              attributionControl={false}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                /* attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' */
-              />
-              <LocationMarker onLocationSelect={handleLocationSelect} />
-              {markerPosition && (
-                <Marker position={markerPosition} />
-              )}
-            </MapContainer>
-            {selectedLocation && nearbyRentals.length > 0 && (
-              <div className="nearby-rentals">
-                <h3>{t.nearbyRentals || "Yaqin atrofdagi kvartiralar"}</h3>
-                {nearbyRentals.map(rental => (
-                  <div 
-                    key={rental.id} 
-                    className="nearby-rental-item"
-                    onClick={() => openRentalModal(rental)}
-                  >
-                    <h4>{rental.title}</h4>
-                    <p>{rental.price}</p>
-                    <p>{rental.beds}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* About Section */}
+        <section id="about" className="about-section">
+          <div className="about-content">
+            <h2>{t.about}</h2>
+            <p>{t.aboutMainText}</p>
           </div>
-        </section>
-
-        <section id="about-section" className="about-section">
-          <h2>{t.about}</h2>
-          <p>{t.aboutMainText}</p>
           <div className="about-cards">
             <div className="about-card">
-              <h3>{locales[currentLanguage].aboutCard1Title}</h3>
-              <p>{locales[currentLanguage].aboutCard1Text}</p>
+              <h3>{t.aboutCard1Title}</h3>
+              <p>{t.aboutCard1Text}</p>
             </div>
             <div className="about-card">
-              <h3>{locales[currentLanguage].aboutCard2Title}</h3>
-              <p>{locales[currentLanguage].aboutCard2Text}</p>
+              <h3>{t.aboutCard2Title}</h3>
+              <p>{t.aboutCard2Text}</p>
             </div>
             <div className="about-card">
-              <h3>{locales[currentLanguage].aboutCard3Title}</h3>
-              <p>{locales[currentLanguage].aboutCard3Text}</p>
+              <h3>{t.aboutCard3Title}</h3>
+              <p>{t.aboutCard3Text}</p>
             </div>
             <div className="about-card">
-              <h3>{locales[currentLanguage].aboutCard4Title}</h3>
-              <p>{locales[currentLanguage].aboutCard4Text}</p>
+              <h3>{t.aboutCard4Title}</h3>
+              <p>{t.aboutCard4Text}</p>
             </div>
           </div>
-          <div className="about-stats">
-            <div className="stat-item">
-              <h2>{locales[currentLanguage].stat1Number}</h2>
-              <p>{locales[currentLanguage].stat1Text}</p>
-            </div>
-            <div className="stat-item">
-              <h2>{locales[currentLanguage].stat2Number}</h2>
-              <p>{locales[currentLanguage].stat2Text}</p>
-            </div>
-            <div className="stat-item">
-              <h2>{locales[currentLanguage].stat3Number}</h2>
-              <p>{locales[currentLanguage].stat3Text}</p>
-            </div>
-            <div className="stat-item">
-              <h2>{locales[currentLanguage].stat4Number}</h2>
-              <p>{locales[currentLanguage].stat4Text}</p>
+          <div className="stats-section">
+            <h3>{t.aboutStatsTitle}</h3>
+            <div className="stats-container">
+              <div className="stat-item">
+                <span className="stat-number">{t.stat1Number}</span>
+                <span className="stat-text">{t.stat1Text}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">{t.stat2Number}</span>
+                <span className="stat-text">{t.stat2Text}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">{t.stat3Number}</span>
+                <span className="stat-text">{t.stat3Text}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">{t.stat4Number}</span>
+                <span className="stat-text">{t.stat4Text}</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Contact Form */}
-        <h2>{t.contactFormTitle}</h2>
-        <div className="contact-container">
-          <div className="contact-form">
-            <h2>{t.sendMessageHeading}</h2>
-            <div className="form-group">
-              <input type="text" id="contact-name" placeholder={t.contactFormNamePlaceholder} />
+        {/* Contact Section */}
+        <section id="contact" className="contact-section">
+            <div className="contact-container">
+                <div className="contact-form-container">
+                    <h3>{t.sendMessageHeading}</h3>
+                    <form className="contact-form">
+                        <div className="form-group">
+                            <label htmlFor="name">{t.contactFormNamePlaceholder}</label>
+                            <input type="text" id="name" placeholder={t.contactFormNamePlaceholder} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="email">{t.contactFormEmailPlaceholder}</label>
+                            <input type="email" id="email" placeholder={t.contactFormEmailPlaceholder} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="message">{t.contactFormMessagePlaceholder}</label>
+                            <textarea id="message" rows="5" placeholder={t.contactFormMessagePlaceholder}></textarea>
+                        </div>
+                        <button type="submit">{t.contactFormButton}</button>
+                    </form>
+                </div>
+                <div className="contact-info-container">
+                    <h3>{t.contactInfoTitle}</h3>
+                    <div className="contact-info-item">
+                        <FaMapMarkerAlt className="contact-icon" />
+                        <div>
+                            <strong>{t.addressLabel}:</strong>
+                            <p>{t.contactAddress}</p>
+                        </div>
+                    </div>
+                    <div className="contact-info-item">
+                        <FaPhone className="contact-icon" />
+                        <div>
+                            <strong>{t.phoneLabel}:</strong>
+                            <p>{t.contactPhone1}</p>
+                            <p>{t.contactPhone2}</p>
+                        </div>
+                    </div>
+                    <div className="contact-info-item">
+                        <FaEnvelope className="contact-icon" />
+                        <div>
+                            <strong>Email:</strong>
+                            <p><a href={`mailto:${t.contactEmail1}`}>{t.contactEmail1}</a></p>
+                            <p><a href={`mailto:${t.contactEmail2}`}>{t.contactEmail2}</a></p>
+                        </div>
+                    </div>
+                    <div className="contact-info-item">
+                        <FaClock className="contact-icon" />
+                        <div>
+                            <strong>{t.workingHoursLabel}:</strong>
+                            <p>{t.workingHours}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div className="form-group">
-              <input type="email" id="contact-email" placeholder={t.contactFormEmailPlaceholder} />
-            </div>
-            <div className="form-group">
-              <textarea id="contact-message" placeholder={t.contactFormMessagePlaceholder} className="contact-textarea"></textarea>
-            </div>
-            <button type="submit">{t.contactFormButton}</button>
-          </div>
-          <div className="contact-info">
-            <h3>{t.contactInfoTitle}</h3>
-            <p><FaMapMarkerAlt /> <b>{t.addressLabel}:</b> <span>{t.contactAddress}</span></p>
-            <p><FaPhone /> <b>{t.phoneLabel}:</b> <span>{t.contactPhone1}<br/>{t.contactPhone2}</span></p>
-            <p><FaEnvelope /> <b>{t.emailLabel}:</b> <span>{t.contactEmail1}<br/>{t.contactEmail2}</span></p>
-            <p><FaClock /> <b>{t.workingHoursLabel}:</b> <span>{t.workingHours}</span></p>
-          </div>
-        </div>
+        </section>
+
+        {/* Map Section */}
+        <section className="map-section">
+            <h2>{t.selectLocation}</h2>
+            <MapContainer center={mapCenter} zoom={13} style={{ height: '400px', width: '100%' }}>
+                <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <LocationMarker onLocationSelect={handleLocationSelect} />
+                {selectedLocation && <Marker position={selectedLocation} />}
+            </MapContainer>
+        </section>
 
       </main>
 
-      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} t={t} />}
-      {showRegisterModal && <RegisterModal onClose={() => setShowRegisterModal(false)} t={t} />}
-      {showCompareModal && <CompareModal onClose={() => { setShowCompareModal(false); clearComparison(); }} rentalsToCompare={rentalsToCompare} clearComparison={clearComparison} t={t} />}
-      {showRentalModal && selectedRental && (
-        <RentalModal
-          rental={selectedRental}
-          onClose={closeRentalModal}
-          currentImageIndex={currentImageIndex}
-          nextImage={nextImage}
-          prevImage={prevImage}
-          toggleSave={toggleSave}
-          handleRating={handleRating}
-          toggleCompare={toggleCompare}
-          openShareModal={openShareModal}
+      {showLoginModal && (
+        <LoginModal t={t} closeModal={() => setShowLoginModal(false)} />
+      )}
+      {showRegisterModal && (
+        <RegisterModal t={t} closeModal={() => setShowRegisterModal(false)} />
+      )}
+      {showCompareModal && (
+        <CompareModal
           t={t}
+          rentals={compareList}
+          closeModal={() => setShowCompareModal(false)}
+          clearComparison={clearComparison}
+          darkMode={darkMode}
         />
       )}
+      {selectedRental && showRentalModal && (
+        <RentalModal
+          t={t}
+          rental={selectedRental}
+          closeModal={closeRentalModal}
+          nextImage={nextImage}
+          prevImage={prevImage}
+          currentImageIndex={currentImageIndex}
+          darkMode={darkMode}
+        />
+      )}
+
       {showShareModal && (
-        <div className="modal-overlay">
-          <div className="modal-content share-modal">
-            <button className="modal-close" onClick={closeShareModal}>&times;</button>
-            <h2>{t.share}</h2>
-            <p>{t.shareTitle}</p>
+        <div className="modal-overlay" onClick={closeShareModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <span className="close-button" onClick={closeShareModal}>
+              &times;
+            </span>
+            <h3>{t.shareTitle}</h3>
             <div className="share-options">
               <button onClick={() => shareOnSocialMedia('facebook')}>Facebook</button>
+              <button onClick={() => shareOnSocialMedia('telegram')}>Telegram</button>
               <button onClick={() => shareOnSocialMedia('twitter')}>Twitter</button>
-              <button onClick={() => shareOnSocialMedia('linkedin')}>LinkedIn</button>
             </div>
           </div>
         </div>
       )}
-      <footer>
-        <div className="footer-container">
-          <div className="footer-logo">
-            <h3>{t.footerTitle}</h3>
-            <p>{t.footerCopy}</p>
-          </div>
-          <div className="footer-links">
-            <h4>{t.footerLinksTitle}</h4>
-            <ul>
-              <li><a href="#home-section">{t.footerLinkHome}</a></li>
-              <li><a href="#rentals-section">{t.footerLinkRentals}</a></li>
-              <li><a href="#about-section">{t.footerLinkAbout}</a></li>
-              <li><a href="#about-section">{t.footerLinkContact}</a></li>
-            </ul>
-          </div>
-          <div className="footer-contact">
-            <h4>{t.footerContactTitle}</h4>
-            <p><FaMapMarkerAlt /> {t.footerAddress}</p>
-            <p><FaPhone /> {t.footerPhone}</p>
-            <p><FaEnvelope /> {t.footerEmail}</p>
-          </div>
+
+      <footer className="footer-section">
+      <div className="footer-content">
+        <div className="footer-logo">
+          <h2>{t.footerTitle}</h2>
         </div>
-      </footer>
+        <div className="footer-links">
+          <h3>{t.footerLinksTitle}</h3>
+          <ul>
+            <li><a href="#home">{t.footerLinkHome}</a></li>
+            <li><a href="#rentals">{t.footerLinkRentals}</a></li>
+            <li><a href="#about">{t.footerLinkAbout}</a></li>
+            <li><a href="#contact">{t.footerLinkContact}</a></li>
+          </ul>
+        </div>
+        <div className="footer-contact">
+          <h3>{t.footerContactTitle}</h3>
+          <p><FaMapMarkerAlt /> {t.footerAddress}</p>
+          <p><FaPhone /> {t.footerPhone}</p>
+          <p><FaEnvelope /> {t.footerEmail}</p>
+        </div>
+      </div>
+      <div className="footer-copy">
+        <p>{t.footerCopy}</p>
+      </div>
+    </footer>
     </div>
   );
 }
 
-// Xarita uchun yordamchi komponent
 function LocationMarker({ onLocationSelect }) {
-  const map = useMapEvents({
-    click(e) {
-      onLocationSelect(e.latlng);
-    },
-  });
-
-  return null;
+    useMapEvents({
+        click(e) {
+            onLocationSelect(e.latlng);
+        },
+    });
+    return null;
 }
 
 export default App;

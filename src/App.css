@@ -144,7 +144,7 @@ nav.main-nav a:hover {
 }
 
 .header-actions button:hover, .header-actions select:hover {
-  background: rgba(37, 99, 235, 0.1);
+   background: rgba(37, 99, 235, 0.1);
 }
 
 .app.dark .header-actions button, .app.dark .header-actions select {
@@ -152,7 +152,7 @@ nav.main-nav a:hover {
 }
 
 .app.dark .header-actions button:hover, .app.dark .header-actions select:hover {
-  background: rgba(96, 165, 250, 0.1);
+   background: rgba(96, 165, 250, 0.1);
 }
 
 .app.dark .header-actions select {
@@ -465,9 +465,9 @@ h1, h2 {
 .app.dark .form-group input[type="email"]:focus,
 .app.dark .form-group input[type="password"]:focus,
 .app.dark .form-group input[type="text"]:focus {
-  background: #23272f;
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.33);
+   background: #23272f;
+   border-color: #60a5fa;
+   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.33);
 }
 
 .login-modal button[type="submit"],
@@ -805,17 +805,17 @@ h1, h2 {
 }
 
 .app.dark .home-section h1 {
-  color: #fff;
+    color: #fff;
 }
 
 .home-section p {
-  margin-bottom: 5px;
-  color: inherit;
-  font-size: 1rem;
+    margin-bottom: 5px;
+    color: inherit;
+    font-size: 1rem;
 }
 
 .app.dark .home-section p {
-  color: #bbb;
+    color: #bbb;
 }
 
 @media (max-width: 900px) {
@@ -825,10 +825,10 @@ h1, h2 {
 }
 
 .home-features {
-  display: flex;
-  justify-content: center;
-  gap: 36px;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    flex-wrap: wrap;
 }
 
 .feature-item {
@@ -847,7 +847,7 @@ h1, h2 {
 }
 
 .app.dark .feature-item h3 {
-  color: #fff;
+    color: #fff;
 }
 
 .feature-item p {
@@ -856,7 +856,7 @@ h1, h2 {
 }
 
 .app.dark .feature-item p {
-  color: #bbb;
+    color: #bbb;
 }
 
 @media (max-width: 768px) {
@@ -868,7 +868,7 @@ h1, h2 {
 
 .about-section {
   padding: 40px 20px;
-  text-align: center;
+    text-align: center;
   margin-bottom: 40px;
 }
 
@@ -878,92 +878,92 @@ h1, h2 {
 
 .about-section h2 {
   margin-top: 80px;
-  margin-bottom: 24px;
+    margin-bottom: 24px;
   color: #000;
 }
 
 .app.dark .about-section h2 {
-  color: #fff;
+    color: #fff;
 }
 
 .about-cards {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
   margin-bottom: 30px;
 }
 
 .about-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 30px 20px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 20px;
   width: 200px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  text-align: left;
-  transition: transform 0.3s ease;
+    text-align: left;
+    transition: transform 0.3s ease;
   flex-shrink: 0;
 }
 
 .app.dark .about-card {
-  background: #2f3541;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    background: #2f3541;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
 }
 
 .about-card:hover {
-  transform: translateY(-8px);
+    transform: translateY(-8px);
 }
 
 .about-card h3 {
-  color: #2563eb;
-  margin-bottom: 12px;
+    color: #2563eb;
+    margin-bottom: 12px;
 }
 
 .app.dark .about-card h3 {
-  color: #60a5fa;
+    color: #60a5fa;
 }
 
 .about-card p {
-  color: #222;
-  font-size: 1rem;
+    color: #222;
+    font-size: 1rem;
 }
 
 .app.dark .about-card p {
-  color: #bbb;
+    color: #bbb;
 }
 
 .about-stats {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
 }
 
 .stat-item {
-  text-align: center;
+    text-align: center;
 }
 
 .stat-item h2 {
-  font-size: 3rem;
-  color: #2563eb;
-  margin-bottom: 8px;
+    font-size: 3rem;
+    color: #2563eb;
+    margin-bottom: 8px;
 }
 
 .app.dark .stat-item h2 {
-  color: #60a5fa;
+    color: #60a5fa;
 }
 
 .stat-item p {
-  color: #222;
-  font-size: 1rem;
+    color: #222;
+    font-size: 1rem;
 }
 
 .app.dark .stat-item p {
-  color: #bbb;
+    color: #bbb;
 }
 
 .contact-section {
   padding: 40px 20px;
-  text-align: center;
+    text-align: center;
   margin-bottom: 40px;
 }
 
@@ -973,12 +973,12 @@ h1, h2 {
 
 .contact-section h2 {
   margin-top: 30px;
-  margin-bottom: 24px;
-  color: #222;
+    margin-bottom: 24px;
+    color: #222;
 }
 
 .app.dark .contact-section h2 {
-  color: #fff;
+    color: #fff;
 }
 
 .contact-container {
@@ -995,7 +995,7 @@ h1, h2 {
   flex: 1;
   min-width: 300px;
   padding: 20px;
-  border-radius: 8px;
+    border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.35);
 }
 
@@ -1031,13 +1031,13 @@ h1, h2 {
   border-radius: 4px;
   width: calc(100% - 22px);
   margin-bottom: 15px;
-  font-size: 1rem;
+    font-size: 1rem;
 }
 
 .app.dark .contact-form input[type="text"],
 .app.dark .contact-form input[type="email"],
 .app.dark .contact-form textarea {
-  color: #fff;
+    color: #fff;
   border-color: #1d4ed8;
 }
 
@@ -1047,11 +1047,11 @@ h1, h2 {
 
 .contact-form button[type="submit"] {
   background: #888;
-  color: #fff;
-  border: none;
+    color: #fff;
+    border: none;
   padding: 10px 20px;
   border-radius: 4px;
-  cursor: pointer;
+    cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
   transition: background 0.3s ease;
