@@ -1,18 +1,17 @@
-import React from 'react';
-import { FaTimes } from 'react-icons/fa';
+import React from "react";
 
-function CompareModal({ onClose, rentalsToCompare, clearComparison, t }) {
+const CompareModal = ({ onClose, rentalsToCompare, clearComparison }) => {
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={() => { onClose(); clearComparison(); }}>
       <div className="modal-content compare-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}><FaTimes /></button>
-        <h2>{t.compare}</h2>
+        <button className="modal-close" onClick={() => { onClose(); clearComparison(); }}>&times;</button>
+        <h2>Ijaralarni Solishtirish</h2>
         {rentalsToCompare.length > 0 ? (
           <div className="compare-table-wrap">
             <table className="compare-table">
               <thead>
                 <tr>
-                  <th></th>
+                  <th>Xususiyat</th>
                   {rentalsToCompare.map(rental => (
                     <th key={rental.id}>{rental.title}</th>
                   ))}
@@ -20,32 +19,39 @@ function CompareModal({ onClose, rentalsToCompare, clearComparison, t }) {
               </thead>
               <tbody>
                 <tr>
-                  <td><b>{t.locationLabel}</b></td>
+                  <td>Narxi</td>
+                  {rentalsToCompare.map(rental => (
+                    <td key={rental.id}>{rental.price}</td>
+                  ))}
+                </tr>
+                <tr>
+                  <td>Manzil</td>
                   {rentalsToCompare.map(rental => (
                     <td key={rental.id}>{rental.city}</td>
                   ))}
                 </tr>
                 <tr>
-                  <td><b>{t.priceLabel}</b></td>
+                  <td>Xonalar soni</td>
                   {rentalsToCompare.map(rental => (
-                    <td key={rental.id}>{rental.price}{rental.currency}</td>
+                    <td key={rental.id}>{rental.beds}</td>
                   ))}
                 </tr>
-                {/* Add more comparison rows as needed */}
+                <tr>
+                  <td>Tavsif</td>
+                  {rentalsToCompare.map(rental => (
+                    <td key={rental.id}>{rental.description}</td>
+                  ))}
+                </tr>
+                {/* Qo'shimcha xususiyatlarni shu yerga qo'shish mumkin */}
               </tbody>
             </table>
           </div>
         ) : (
-          <p>{t.noRentalsToCompare}</p>
-        )}
-        {rentalsToCompare.length > 0 && (
-           <button onClick={clearComparison} style={{ marginTop: '20px' }}>
-            {t.clearComparisonButton}
-          </button>
+          <p>Solishtirish uchun ijaralar tanlanmagan.</p>
         )}
       </div>
     </div>
   );
-}
+};
 
 export default CompareModal; 

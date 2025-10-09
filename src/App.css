@@ -20,7 +20,7 @@ body {
   color: #fff;
 }
 
-.app.dark body {
+body.dark-mode-body {
   background: #181a20;
 }
 
@@ -223,6 +223,17 @@ main {
 .search-bar button:hover {
   background: linear-gradient(90deg, #1d4ed8 60%, #2563eb 100%);
   box-shadow: 0 4px 16px rgba(37,99,235,0.18);
+}
+
+.search-bar button:disabled {
+  background: #b0b0b0;
+  cursor: not-allowed;
+}
+
+.app.dark .search-bar select {
+  background: #2f3541;
+  color: #fff;
+  border-color: #4b5563;
 }
 
 .rentals {
@@ -617,7 +628,7 @@ h1, h2 {
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-.dark .app header nav button:hover {
+.app.dark header nav button:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -1037,8 +1048,9 @@ h1, h2 {
 .app.dark .contact-form input[type="text"],
 .app.dark .contact-form input[type="email"],
 .app.dark .contact-form textarea {
+    background-color: #2f3541;
     color: #fff;
-  border-color: #1d4ed8;
+    border-color: #1d4ed8;
 }
 
 .contact-textarea {
@@ -1368,4 +1380,31 @@ footer {
     width: 100%;
     max-width: 400px;
   }
+}
+
+.app.dark .search-bar select {
+  background: #2f3541;
+  color: #fff;
+  border-color: #4b5563;
+}
+
+.app.dark .contact-form input[type="text"],
+.app.dark .contact-form input[type="email"],
+.app.dark .contact-form textarea {
+  background-color: #2f3541;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+
+.contact-form button[type="submit"]:hover {
+  background: #222;
+}
+
+.app.dark .contact-form button[type="submit"] {
+  background: #2563eb;
+  color: #fff;
+}
+
+.app.dark .contact-form button[type="submit"]:hover {
+  background: #1d4ed8;
 }
