@@ -4,6 +4,26 @@ import { FaHeart, FaStar, FaShare } from 'react-icons/fa';
 const RentalModal = ({ rental, onClose, currentImageIndex, nextImage, prevImage, toggleSave, handleRating, toggleCompare, openShareModal }) => {
   if (!rental) return null;
 
+  const safeToggleSave = (id) => {
+    if (typeof toggleSave === 'function') return toggleSave(id);
+    console.warn('toggleSave is not a function');
+  };
+
+  const safeToggleCompare = (item) => {
+    if (typeof toggleCompare === 'function') return toggleCompare(item);
+    console.warn('toggleCompare is not a function');
+  };
+
+  const safeOpenShare = (id) => {
+    if (typeof openShareModal === 'function') return openShareModal(id);
+    console.warn('openShareModal is not a function');
+  };
+
+  const safeHandleRating = (id, rating) => {
+    if (typeof handleRating === 'function') return handleRating(id, rating);
+    console.warn('handleRating is not a function');
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -24,21 +44,21 @@ const RentalModal = ({ rental, onClose, currentImageIndex, nextImage, prevImage,
         <p><strong>Narxi:</strong> {rental.price}{rental.currency}</p>
 
         <div className="rental-actions">
-           <button
+          <button
             className={`action-btn ${rental.isSaved ? 'active' : ''}`}
-            onClick={() => toggleSave(rental.id)}
+            onClick={() => safeToggleSave(rental.id)}
           >
             <FaHeart /> {rental.isSaved ? 'Saqlangan' : 'Saqlash'}
           </button>
            <button
             className="action-btn"
-            onClick={() => toggleCompare(rental)}
+            onClick={() => safeToggleCompare(rental)}
           >
             Solishtirish
           </button>
            <button
             className="action-btn"
-             onClick={() => openShareModal(rental.id)}
+             onClick={() => safeOpenShare(rental.id)}
           >
             <FaShare /> Ulashish
           </button>
@@ -48,7 +68,7 @@ const RentalModal = ({ rental, onClose, currentImageIndex, nextImage, prevImage,
             <button
               key={star}
               className={`rating-btn ${star <= rental.rating ? 'active' : ''}`}
-              onClick={() => handleRating(rental.id, star)}
+              onClick={() => safeHandleRating(rental.id, star)}
             >
               <FaStar />
             </button>
