@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/leaseON/static/css/main.493463a5.css",
-    "main.js": "/leaseON/static/js/main.ffdc62ef.js",
-    "static/js/453.bd01f6ef.chunk.js": "/leaseON/static/js/453.bd01f6ef.chunk.js",
+    "main.css": "/leaseON/static/css/main.0196faa4.css",
+    "main.js": "/leaseON/static/js/main.5d580bf5.js",
+    "static/js/488.21513e63.chunk.js": "/leaseON/static/js/488.21513e63.chunk.js",
     "static/media/loft.png": "/leaseON/static/media/loft.435ec65021140b40f302.png",
     "static/media/apartment.png": "/leaseON/static/media/apartment.1a148660c353df23021b.png",
     "static/media/studio.png": "/leaseON/static/media/studio.a14f18beaa8b11b7b7e7.png",
     "index.html": "/leaseON/index.html",
-    "main.493463a5.css.map": "/leaseON/static/css/main.493463a5.css.map",
-    "main.ffdc62ef.js.map": "/leaseON/static/js/main.ffdc62ef.js.map",
-    "453.bd01f6ef.chunk.js.map": "/leaseON/static/js/453.bd01f6ef.chunk.js.map"
+    "main.0196faa4.css.map": "/leaseON/static/css/main.0196faa4.css.map",
+    "main.5d580bf5.js.map": "/leaseON/static/js/main.5d580bf5.js.map",
+    "488.21513e63.chunk.js.map": "/leaseON/static/js/488.21513e63.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.493463a5.css",
-    "static/js/main.ffdc62ef.js"
+    "static/css/main.0196faa4.css",
+    "static/js/main.5d580bf5.js"
   ]
 }
